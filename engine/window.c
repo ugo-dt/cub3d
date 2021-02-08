@@ -6,7 +6,7 @@
 /*   By: ugdaniel <ugdaniel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 15:09:56 by ugdaniel          #+#    #+#             */
-/*   Updated: 2021/01/15 14:31:21 by ugdaniel         ###   ########.fr       */
+/*   Updated: 2021/02/08 20:23:06 by ugdaniel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ int		init_window(t_window *window, t_config *config)
 		window->size.x = 1920;
 	if (window->size.y > 1080)
 		window->size.y = 1080;
-	if (window->size.x < 1024)
-		window->size.x = 1024;
-	if (window->size.y < 576)
-		window->size.y = 576;
+	if (window->size.x < 100)
+		window->size.x = 100;
+	if (window->size.y < 100)
+		window->size.y = 100;
 	window->mlx_ptr = NULL;
 	window->window = NULL;
 	if (!(window->mlx_ptr = mlx_init()) ||
