@@ -6,7 +6,7 @@
 /*   By: ugdaniel <ugdaniel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:25:52 by ugdaniel          #+#    #+#             */
-/*   Updated: 2021/02/08 11:59:55 by ugdaniel         ###   ########.fr       */
+/*   Updated: 2021/02/09 11:53:46 by ugdaniel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ int			game_launch(t_game *game)
 		return (exit_error(game, "Error\nCub3D: could not load textures\n"));
 	if (!find_sprites(game))
 		return (exit_error(game, "Error:\nfailed to malloc sprites.\n"));
-	mlx_mouse_hide();
 	calculate(game);
 	return (1);
 }
