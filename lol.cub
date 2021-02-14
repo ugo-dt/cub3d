@@ -1,0 +1,18 @@
+R 1000 1000
+
+NO ./resources/wall_0.xpm
+SO ./resources/wall_0.xpm
+EA ./resources/wall_0.xpm
+WE ./resources/wall_0.xpm
+
+S ./resources/sprite_1.xpm
+
+F 160,118,76
+C 50,50,50
+
+1111111111111111
+1000000000000001
+1000002000N00001
+1100001111100011
+ 100021   10001
+ 111111   11111
