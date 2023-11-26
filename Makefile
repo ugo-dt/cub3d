@@ -6,61 +6,115 @@
 #    By: ugdaniel <ugdaniel@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/08 14:35:57 by ugdaniel          #+#    #+#              #
-#    Updated: 2021/02/10 12:52:03 by ugdaniel         ###   ########.fr        #
+#    Updated: 2023/11/26 16:19:02 by ugdaniel         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		=	./main.c ./game.c ./cub3d.c ./save_frame.c \
-				./engine/window.c ./engine/draw.c ./engine/screen.c ./engine/camera.c \
-				./engine/raycast.c ./engine/shortcut.c ./engine/draw_wall.c ./engine/ui.c \
-				./engine/color.c ./engine/draw_sky_floor.c ./engine/calculate.c \
-				./engine/texture.c ./engine/sprite.c ./engine/sprite_utils.c \
-				./config/config.c ./config/map.c ./config/parse_params.c \
-				./config/check_map.c ./config/parse_textures.c \
-				./utils/ft_strlen.c ./utils/ft_strncmp.c ./utils/ft_strnstr.c \
-				./utils/t_str.c ./utils/ft_strdup.c ./utils/pos.c ./utils/char_in_str.c \
-				./utils/ft_atoi.c ./utils/ft_memmove.c ./utils/ft_substr.c \
-				./gnl/get_next_line.c ./gnl/get_next_line_utils.c
-OBJS		=	$(SRCS:.c=.o)
+NAME = cub3d
+OSTYPE = $(shell uname)
 
-RM			=	rm -f
+SRCS = $(wildcard srcs/*.c srcs/*/*.c)
+OBJS = $(SRCS:.c=.o)
 
-#CC			=	clang
-#CFLAGS		=	-Wall -Wextra -Werror -I. -fsanitize=address
+CC = @clang
+FLAGS = -Wall -Wextra -Werror
 
-#MLX		=	libmlx.a
-#LIBS		=	$(MLX) -lm -framework OpenGL -framework AppKit
+LIBFT_PATH = lib/libft
+LIBFT = $(LIBFT_PATH)/libft.a
+LIBS = $(LIBFT) -lm -Imlx
 
-CC			= clang
-FLAGS		= -Wall -Werror -Wextra
+MLX_PATH = lib/mlx/$(OSTYPE)
 
-MLX			= ./minilibx-linux/libmlx.a
-MLXLINUX	= ./minilibx-linux/libmlx_Linux.a
+INCLUDE = -I include -I $(LIBFT_PATH)/include
 
-NAME		=	Cub3D
+ifeq ($(OSTYPE),Linux)
+	MLX_PATH = lib/mlx/linux
+	MLX = $(MLX_PATH)/libmlx.a
+	LIBS += $(MLX) -L $(MLX_PATH) -lXext -lX11
+	INCLUDE += -I lib/mlx/linux
+	FLAGS += -DLINUX
+else
+	MLX_PATH = lib/mlx/darwin
+	MLX = $(MLX_PATH)/libmlx.a
+	LIBS += $(MLX) -framework OpenGL -framework AppKit
+	INCLUDE += -I lib/mlx/darwin
+endif
 
+white = \033[39m
+green = \033[92m
+cyan = \033[96m
+magenta = \033[35m
+lmagenta = \033[95m
+yellow = \033[33m
+gray = \033[37m
+red = \033[91m
+blue = \033[94m
 
 all: $(NAME)
+	@echo "$(green)$(NAME) ready!"
+	@echo "$(white)\c"
 
-#$(NAME): $(MLX) $(OBJS)
-#	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBS)
+$(NAME): $(MLX) $(LIBFT) $(OBJS)
+	@echo "$(yellow)Source files compiled"
+	@echo "$(red)\c"
+	$(CC) $(FLAGS) -o $(NAME) $(OBJS) $(LIBS)
 
-$(NAME): $(OBJS)
-	@make -s do_configure -C minilibx-linux -f Makefile
-	${CC} ${OBJS} $(HEADERS) $(MLX) $(MLXLINUX) -L minilibx-linux -lX11 -lXext -lm -o $(NAME) -fsanitize=address
-	@echo "Cub3d done"
+.c.o:
+	@echo "$(gray)Compiling $<... \c"
+	@echo "$(red)\c"
+	$(CC) $(FLAGS) $(INCLUDE) -c $< -o $@
+	@echo "$(cyan)OK!"
 
 $(MLX):
-	@make -C mlx
-	@mv mlx/$(MLX) .
+	@echo "$(gray)Compiling MiniLibX... \c"
+	@make -s -C $(MLX_PATH)
+	@echo "$(cyan)OK!\n"
+	clear
+	@echo "$(green)MiniLibX compiled"
+	@echo "$(red)\c"
 
-clean:
-	@make -C mlx clean
-	$(RM) $(OBJS)
+$(LIBFT):
+	@echo "$(gray)Compiling Libft... \c"
+	@make -s -C $(LIBFT_PATH)
+	@echo "$(cyan)OK!\n$(green)Libft compiled"
+	@echo "$(red)\c"
 
-fclean: clean
-	$(RM) $(NAME) $(MLX)
+clean_libft:
+	@echo "$(gray)Cleaning Libft"
+	@make -s clean -C $(LIBFT_PATH)
 
-re: fclean all
+clean_mlx:
+	@echo "$(gray)Cleaning MiniLibX"
+	@make -s clean -C $(MLX_PATH)
 
-.PHONY: all clean fclean re
+fclean_mlx: clean_mlx
+	@rm -f $(MLX)
+	@echo "$(magenta)$(MLX) removed"
+
+clean_objs:
+	@echo "$(gray)Cleaning object files"
+	@echo "$(red)\c"
+	@rm -rf $(OBJS)
+
+clean: clean_mlx clean_libft clean_objs
+
+fclean_exec: clean_objs
+	@rm -rf $(NAME)
+	@echo "$(lmagenta)Executable removed"
+	@echo "$(red)\c"
+
+fclean_libft: clean_libft
+	@rm -rf $(LIBFT)
+	@echo "$(magenta)$(LIBFT) removed"
+	@echo "$(red)\c"
+
+fclean: fclean_mlx fclean_libft fclean_exec
+
+re_nolib: fclean_exec newline all
+
+re: fclean newline all clean_objs
+
+newline:
+	@echo ""
+
+.PHONY: all clean_mlx clean_libft clean_objs clean fclean_exec fclean_libft fclean re_nolib re
